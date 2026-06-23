@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kingdom Defense</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- MENU -->
+  <div id="menu">
+  <div class="menu-bg"></div>
+
+  <h1 class="title">⚔ KINGDOM DEFENSE</h1>
+  <p class="subtitle">Protect the base. Survive the night.</p>
+
+  <div class="menu-buttons">
+    <button class="btn" id="playBtn">Begin</button>
+  </div>
+
+  <div id="howPanel">
+    <h2>How to Play</h2>
+    <p>
+      ← → Move<br>
+      B &nbsp;Build selected structure<br>
+      X &nbsp;Remove building<br>
+      1–4 Select building type<br>
+      <span style="color:#bb88ff;">
+        N &nbsp;Skip to Night</span> 
+    </p>
+    <button class="btn small" id="closeHow">Back</button>
+  </div>
+ </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOver">
+    <h1>FALLEN</h1>
+    <p id="goStats">Your base was destroyed.</p>
+    <button class="btn" id="restartBtn">Rise Again</button>
+  </div>
+
+  <!-- VICTORY -->
+  <div id="victory">
+    <h1>VICTORY</h1>
+    <p id="victoryStats">The Broken King has fallen.</p>
+    <div class="victory-buttons">
+      <button class="btn" id="victoryRestartBtn">Defend Again</button>
+      <button class="btn endless" id="victoryContinueBtn">Continue On</button>
+    </div>
+    <p class="endless-hint">Enemies grow stronger every wave.</p>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-panel">
+      💰 <span id="hudMoney">0</span> &nbsp;·&nbsp; 🏗 <span id="hudTowers">0</span> &nbsp;·&nbsp; ⚔ <span id="hudKills">0</span> kills &nbsp;·&nbsp; 🌊 Wave <span id="hudWave">0</span>
+    </div>
+    <div class="hud-panel" style="text-align:right;">
+      🏰 Base HP<br>
+      <div class="hp-bar-wrap"><div id="hpBar"></div></div>
+      <span id="hudHP">100</span> / <span id="hudMaxHP">100</span>
+    </div>
+  </div>
+
+  <!-- DAY LABEL -->
+  <div id="dayLabel">☀ DAY 1</div>
+  <button id="skipNightBtn" onclick="skipToNight()" style="display:none;">⚡ Skip to Night</button>
+
+  <!-- RIGHT SIDE PANEL: Build Bar + Tech Tree -->
+  <div id="rightUI">
+    <div id="rightPanel">
+      <div id="panelHeader">
+        <span class="panel-title">BUILD</span>
+      </div>
+      <div id="buildBar">
+        <!-- Slots injected by JS -->
+      </div>
+      <div id="panelDivider"></div>
+      <button id="techTreeBtn">⚗<span class="btn-label">Tech Tree</span></button>
+    </div>
+  </div>
+
+  <!-- TECH TREE MODAL -->
+  <div id="techModal">
+    <div id="techPanel">
+      <button id="closeTechBtn">✕</button>
+      <h2>⚗ TECH TREE</h2>
+      <p class="tech-sub">Spend coins to unlock upgrades and new buildings</p>
+      <div class="tech-grid">
+
+        <!-- Upgrade Base -->
+        <div class="tech-card wide" id="card-upgradeBase">
+          <div class="tech-card-header">
+            <span class="tech-card-icon">🏰</span>
+            <span class="tech-card-title">Reinforce Base</span>
+          </div>
+          <div class="tech-card-desc">Increase base max HP by 50. Can be purchased multiple times.</div>
+          <button class="tech-unlock-btn" id="upgradeBaseBtn">Purchase — 20 💰</button>
+        </div>
+
+        <!-- Wall -->
+        <div class="tech-card" id="card-wall">
+          <div class="tech-card-header">
+            <span class="tech-card-icon">🧱</span>
+            <span class="tech-card-title">Stone Wall</span>
+          </div>
+          <div class="tech-card-desc">A sturdy barrier that blocks enemies. Has 30 HP — enemies must destroy it to pass. Costs 5 💰 to place.</div>
+          <div class="tech-reqs" id="wallReqs">Requires: Day 2 · 15 💰</div>
+          <button class="tech-unlock-btn" id="unlockWallBtn">Unlock — 15 💰</button>
+        </div>
+
+        <!-- Splash Tower -->
+        <div class="tech-card" id="card-splash">
+          <div class="tech-card-header">
+            <span class="tech-card-icon">💥</span>
+            <span class="tech-card-title">Splash Tower</span>
+          </div>
+          <div class="tech-card-desc">Fires explosive bolts that damage all enemies in a radius. Costs 20 💰 to place.</div>
+          <div class="tech-reqs" id="splashReqs">Requires: Day 4 · 40 💰</div>
+          <button class="tech-unlock-btn" id="unlockSplashBtn">Unlock — 40 💰</button>
+        </div>
+
+        <div id="card-mage" class="tech-card">
+          <div class="tech-card-header">
+            <span class="tech-card-icon">🔮</span>
+            <span class="tech-card-title">Mage Tower</span>
+          </div>
+          <p class="tech-card-desc">Fires chaining lightning that stuns enemies. Hits flying units. Chains 3→5 targets.</p>
+          <p class="tech-reqs" id="mageReqs">Requires: Day 6 · 100 💰</p>
+          <button class="tech-unlock-btn" id="unlockMageBtn">Unlock — 100 💰</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSE BUTTON -->
+  <button id="pauseBtn" aria-label="Pause">❚❚</button>
+
+  <!-- PAUSE / SETTINGS MODAL -->
+  <div id="pauseModal">
+    <div id="pausePanel">
+      <button id="closePauseBtn">✕</button>
+      <h2>❚❚ PAUSED</h2>
+
+      <div id="pauseTabs">
+        <button class="pause-tab active" id="tabVolumeBtn" data-tab="volume">🔊 Volume</button>
+        <button class="pause-tab" id="tabControlsBtn" data-tab="controls">⌨ Controls</button>
+      </div>
+
+      <!-- VOLUME TAB -->
+      <div class="pause-tab-panel active" id="tabVolume">
+        <div class="settings-grid">
+          <div class="setting-row">
+            <div class="setting-label-row">
+              <span class="setting-icon">🎵</span>
+              <span class="setting-label">Music</span>
+              <span class="setting-val" id="musicVolVal">35%</span>
+            </div>
+            <input type="range" min="0" max="100" value="35" class="vol-slider" id="musicVolSlider">
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label-row">
+              <span class="setting-icon">🗼</span>
+              <span class="setting-label">Unit Volume</span>
+              <span class="setting-val" id="unitVolVal">100%</span>
+            </div>
+            <div class="setting-desc">Tower placement &amp; shooting</div>
+            <input type="range" min="0" max="100" value="100" class="vol-slider" id="unitVolSlider">
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label-row">
+              <span class="setting-icon">🔔</span>
+              <span class="setting-label">Sound Effects</span>
+              <span class="setting-val" id="sfxVolVal">100%</span>
+            </div>
+            <div class="setting-desc">Wave announcements &amp; events</div>
+            <input type="range" min="0" max="100" value="100" class="vol-slider" id="sfxVolSlider">
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROLS / KEYBINDS TAB -->
+      <div class="pause-tab-panel" id="tabControls">
+        <div class="keybind-grid" id="keybindGrid">
+          <!-- Rows injected by JS -->
+        </div>
+        <button class="btn small" id="resetKeybindsBtn">↺ Reset to Defaults</button>
+      </div>
+
+      <button class="btn" id="resumeBtn">▶ Resume</button>
+    </div>
+  </div>
+
+  <!-- TOUCH CONTROLS -->
+  <div id="touchControls">
+    <div id="touchLeft">
+      <button class="touch-btn" id="tLeft">◀</button>
+      <button class="touch-btn" id="tRight">▶</button>
+    </div>
+    <div id="touchRight">
+      <button class="touch-btn touch-action" id="tBuild">BUILD</button>
+      <button class="touch-btn touch-action" id="tDel">DELETE</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <!-- TOWER INFO PANEL -->
+  <div id="towerInfoPanel">
+    <button id="towerInfoClose">✕</button>
+    <div id="towerInfoIcon"></div>
+    <div id="towerInfoName"></div>
+    <div id="towerInfoLevel"></div>
+    <div class="tower-stat-row"><span class="stat-label">Damage</span><span id="towerInfoDmg" class="stat-val"></span></div>
+    <div class="tower-stat-row"><span class="stat-label">Range</span><span id="towerInfoRange" class="stat-val"></span></div>
+    <div class="tower-stat-row"><span class="stat-label">Fire Rate</span><span id="towerInfoRate" class="stat-val"></span></div>
+    <div id="towerInfoUpgradeWrap">
+      <button id="towerInfoUpgradeBtn"></button>
+    </div>
+    <div id="towerInfoMaxed"></div>
+  </div>
+
+<canvas id="gameCanvas"></canvas>
+
+  <audio id="bgMusic" src="Sound/Winterbliss.mp3" loop preload="auto"></audio>
+
+  <script src="game.js"></script>
+</body>
+</html>
